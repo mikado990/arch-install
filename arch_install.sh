@@ -44,12 +44,6 @@ DRIVE='/dev/sda'
 # Hostname of the installed machine.
 HOSTNAME='host100'
 
-# Encrypt everything (except /boot).  Leave blank to disable.
-ENCRYPT_DRIVE='TRUE'
-
-# Passphrase used to encrypt the drive (leave blank to be prompted).
-DRIVE_PASSPHRASE='a'
-
 # Root password (leave blank to be prompted).
 ROOT_PASSWORD='a'
 
@@ -60,13 +54,13 @@ USER_NAME='user'
 USER_PASSWORD='a'
 
 # System timezone.
-TIMEZONE='America/New_York'
+TIMEZONE='Europe/Warsaw'
 
 # Have /tmp on a tmpfs or not.  Leave blank to disable.
 # Only leave this blank on systems with very little RAM.
 TMP_ON_TMPFS='TRUE'
 
-KEYMAP='us'
+KEYMAP='pl'
 # KEYMAP='dvorak'
 
 # Choose your video driver
@@ -85,40 +79,19 @@ WIRELESS_DEVICE="wlan0"
 #WIRELESS_DEVICE="eth1"
 
 setup() {
-    local boot_dev="$DRIVE"1
-    local lvm_dev="$DRIVE"2
+    local boot="$DRIVE"1
+    local swap="$DRIVE"2
+    local root="$DRIVE"3
 
     echo 'Creating partitions'
     partition_drive "$DRIVE"
 
-    if [ -n "$ENCRYPT_DRIVE" ]
-    then
-        local lvm_part="/dev/mapper/lvm"
-
-        if [ -z "$DRIVE_PASSPHRASE" ]
-        then
-            echo 'Enter a passphrase to encrypt the disk:'
-            stty -echo
-            read DRIVE_PASSPHRASE
-            stty echo
-        fi
-
-        echo 'Encrypting partition'
-        encrypt_drive "$lvm_dev" "$DRIVE_PASSPHRASE" lvm
-
-    else
-        local lvm_part="$lvm_dev"
-    fi
-
-    echo 'Setting up LVM'
-    setup_lvm "$lvm_part" vg00
-
     echo 'Formatting filesystems'
-    format_filesystems "$boot_dev"
+    format_filesystems "$boot" "$swap" "$root"
 
     echo 'Mounting filesystems'
-    mount_filesystems "$boot_dev"
-
+    mount_filesystems "$boot" "$swap" "$root"
+    
     echo 'Installing base system'
     install_base
 
@@ -144,8 +117,8 @@ configure() {
     echo 'Installing additional packages'
     install_packages
 
-    echo 'Installing packer'
-    install_packer
+    echo 'Installing YAY'
+    install_yay
 
     echo 'Installing AUR packages'
     install_aur_packages
@@ -227,84 +200,58 @@ configure() {
 partition_drive() {
     local dev="$1"; shift
 
-    # 100 MB /boot partition, everything else under LVM
+    # 1000 MB /boot partition, 8000MB swap and rest for the system
     parted -s "$dev" \
-        mklabel msdos \
-        mkpart primary ext2 1 100M \
-        mkpart primary ext2 100M 100% \
-        set 1 boot on \
-        set 2 LVM on
-}
-
-encrypt_drive() {
-    local dev="$1"; shift
-    local passphrase="$1"; shift
-    local name="$1"; shift
-
-    echo -en "$passphrase" | cryptsetup -c aes-xts-plain -y -s 512 luksFormat "$dev"
-    echo -en "$passphrase" | cryptsetup luksOpen "$dev" lvm
-}
-
-setup_lvm() {
-    local partition="$1"; shift
-    local volgroup="$1"; shift
-
-    pvcreate "$partition"
-    vgcreate "$volgroup" "$partition"
-
-    # Create a 1GB swap partition
-    lvcreate -C y -L1G "$volgroup" -n swap
-
-    # Use the rest of the space for root
-    lvcreate -l '+100%FREE' "$volgroup" -n root
-
-    # Enable the new volumes
-    vgchange -ay
+        mklabel gpt \
+        mkpart boot fat32 1 1000M \
+        mkpart swap linux-swap 1000M 9000M \
+	mkpart arch ext4 9000M 100% \
+        set 1 esp on \
+        set 2 swap on \
+	set 3 root on
 }
 
 format_filesystems() {
-    local boot_dev="$1"; shift
+    local boot="$1"; shift
+    local swap="$1"; shift
+    local root="$1"; shift
 
-    mkfs.ext2 -L boot "$boot_dev"
-    mkfs.ext4 -L root /dev/vg00/root
-    mkswap /dev/vg00/swap
+    mkfs.fat -F32 "$boot"
+    mkswap "$swap"
+    mkfs.ext4 "$root"
 }
 
 mount_filesystems() {
-    local boot_dev="$1"; shift
+    local boot="$1"; shift
+    local swap="$1"; shift
+    local root="$1"; shift
 
-    mount /dev/vg00/root /mnt
+    mount "$root" /mnt
     mkdir /mnt/boot
-    mount "$boot_dev" /mnt/boot
-    swapon /dev/vg00/swap
+    mount "$boot" /mnt/boot
+    swapon "$swap"
 }
 
 install_base() {
-    echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
+    echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist XXXXX
 
-    pacstrap /mnt base base-devel
-    pacstrap /mnt syslinux
+    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers
 }
 
 unmount_filesystems() {
     umount /mnt/boot
     umount /mnt
-    swapoff /dev/vg00/swap
-    vgchange -an
-    if [ -n "$ENCRYPT_DRIVE" ]
-    then
-        cryptsetup luksClose lvm
-    fi
+    swapoff XXX
 }
 
 install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en chromium cpupower gvim mlocate net-tools ntp openssh p7zip pkgfile powertop python python2 rfkill rsync sudo unrar unzip wget zip systemd-sysvcompat zsh grml-zsh-config'
+    packages+=' alsa-utils aspell-en aspell-pl cpupower vim net-tools ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
 
     # Development packages
-    packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
+    #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
 
     # Netcfg
     if [ -n "$WIRELESS_DEVICE" ]
@@ -313,19 +260,16 @@ install_packages() {
     fi
 
     # Java stuff
-    packages+=' icedtea-web-java7 jdk7-openjdk jre7-openjdk'
+    #packages+=' icedtea-web-java7 jdk7-openjdk jre7-openjdk'
 
     # Libreoffice
-    packages+=' libreoffice-calc libreoffice-en-US libreoffice-gnome libreoffice-impress libreoffice-writer hunspell-en hyphen-en mythes-en'
+    #packages+=' libreoffice-calc libreoffice-en-US libreoffice-gnome libreoffice-impress libreoffice-writer hunspell-en hyphen-en mythes-en'
 
     # Misc programs
     packages+=' mplayer pidgin vlc xscreensaver gparted dosfstools ntfsprogs'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit xterm'
-
-    # Slim login manager
-    packages+=' slim archlinux-themes-slim'
 
     # Fonts
     packages+=' ttf-dejavu ttf-liberation'
@@ -356,7 +300,7 @@ install_packages() {
     pacman -Sy --noconfirm $packages
 }
 
-install_packer() {
+install_yay() {
     mkdir /foo
     cd /foo
     curl https://aur.archlinux.org/packages/pa/packer/packer.tar.gz | tar xzf -
