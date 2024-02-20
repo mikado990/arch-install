@@ -105,14 +105,15 @@ setup() {
         echo 'Make sure you unmount everything before you try to run this script again.'
     else
         echo 'Unmounting filesystems'
-        unmount_filesystems
+        unmount_filesystems "$swap"
         echo 'Done! Reboot system.'
     fi
 }
 
 configure() {
-    local boot_dev="$DRIVE"1
-    local lvm_dev="$DRIVE"2
+    local boot="$DRIVE"1
+    local swap="$DRIVE"2
+    local root="$DRIVE"3
 
     echo 'Installing additional packages'
     install_packages
@@ -241,14 +242,14 @@ install_base() {
 unmount_filesystems() {
     umount /mnt/boot
     umount /mnt
-    swapoff XXX
+    swapoff "$1"
 }
 
 install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en aspell-pl cpupower vim net-tools ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
+    packages+=' alsa-utils aspell-en aspell-pl cpupower git vim iproute2 ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
 
     # Development packages
     #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
