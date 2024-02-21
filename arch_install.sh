@@ -726,10 +726,6 @@ update_locate() {
     updatedb
 }
 
-get_uuid() {
-    blkid -o export "$1" | grep UUID | awk -F= '{print $2}'
-}
-
 set -ex
 
 if [ "$1" == "chroot" ]
