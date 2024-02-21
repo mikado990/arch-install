@@ -95,6 +95,9 @@ setup() {
     echo 'Installing base system'
     install_base
 
+    echo 'Setting fstab'
+    set_fstab
+
     echo 'Chrooting into installed system to continue setup...'
     cp $0 /mnt/setup.sh
     arch-chroot /mnt ./setup.sh chroot
@@ -143,10 +146,7 @@ configure() {
     set_keymap
 
     echo 'Setting hosts file'
-    set_hosts "$HOSTNAME"
-
-    echo 'Setting fstab'
-    set_fstab "$TMP_ON_TMPFS" "$boot_dev"
+    set_hosts "$HOSTNAME"  
 
     echo 'Setting initial modules to load'
     set_modules_load
@@ -234,9 +234,13 @@ mount_filesystems() {
 }
 
 install_base() {
-    echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist XXXXX
+    reflector --country 'Poland,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
-    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers
+    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages
+}
+
+set_fstab() {
+    genfstab -U /mnt >> /mnt/etc/fstab
 }
 
 unmount_filesystems() {
@@ -249,7 +253,7 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en aspell-pl cpupower git vim iproute2 ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
+    packages+=' alsa-utils aspell-en cpupower git ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
 
     # Development packages
     #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
@@ -302,17 +306,15 @@ install_packages() {
 }
 
 install_yay() {
-    mkdir /foo
-    cd /foo
-    curl https://aur.archlinux.org/packages/pa/packer/packer.tar.gz | tar xzf -
-    cd packer
+    git clone https://aur.archlinux.org/yay-bin.git
+    cd yay-bin
     makepkg -si --noconfirm --asroot
 
-    cd /
-    rm -rf /foo
+    cd ..
+    rm -rf yay-bin
 }
 
-install_aur_packages() {
+install_aur_packages() { XXXXXXXXXX
     mkdir /foo
     export TMPDIR=/foo
     packer -S --noconfirm android-udev
@@ -339,7 +341,7 @@ set_hostname() {
 set_timezone() {
     local timezone="$1"; shift
 
-    ln -sT "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
+    ln -sfT "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
 }
 
 set_locale() {
@@ -353,31 +355,12 @@ set_keymap() {
     echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
 }
 
-set_hosts() {
+set_hosts() { XXXXXX
     local hostname="$1"; shift
 
     cat > /etc/hosts <<EOF
 127.0.0.1 localhost.localdomain localhost $hostname
 ::1       localhost.localdomain localhost $hostname
-EOF
-}
-
-set_fstab() {
-    local tmp_on_tmpfs="$1"; shift
-    local boot_dev="$1"; shift
-
-    local boot_uuid=$(get_uuid "$boot_dev")
-
-    cat > /etc/fstab <<EOF
-#
-# /etc/fstab: static file system information
-#
-# <file system> <dir>    <type> <options>    <dump> <pass>
-
-/dev/vg00/swap none swap  sw                0 0
-/dev/vg00/root /    ext4  defaults,relatime 0 1
-
-UUID=$boot_uuid /boot ext2 defaults,relatime 0 2
 EOF
 }
 
@@ -693,101 +676,6 @@ root ALL=(ALL) ALL
 EOF
 
     chmod 440 /etc/sudoers
-}
-
-set_slim() {
-    cat > /etc/slim.conf <<EOF
-# Path, X server and arguments (if needed)
-# Note: -xauth $authfile is automatically appended
-default_path        /bin:/usr/bin:/usr/local/bin
-default_xserver     /usr/bin/X
-xserver_arguments -nolisten tcp vt07
-
-# Commands for halt, login, etc.
-halt_cmd            /sbin/poweroff
-reboot_cmd          /sbin/reboot
-console_cmd         /usr/bin/xterm -C -fg white -bg black +sb -T "Console login" -e /bin/sh -c "/bin/cat /etc/issue; exec /bin/login"
-suspend_cmd         /usr/bin/systemctl hybrid-sleep
-
-# Full path to the xauth binary
-xauth_path         /usr/bin/xauth 
-
-# Xauth file for server
-authfile           /var/run/slim.auth
-
-# Activate numlock when slim starts. Valid values: on|off
-# numlock             on
-
-# Hide the mouse cursor (note: does not work with some WMs).
-# Valid values: true|false
-# hidecursor          false
-
-# This command is executed after a succesful login.
-# you can place the %session and %theme variables
-# to handle launching of specific commands in .xinitrc
-# depending of chosen session and slim theme
-#
-# NOTE: if your system does not have bash you need
-# to adjust the command according to your preferred shell,
-# i.e. for freebsd use:
-# login_cmd           exec /bin/sh - ~/.xinitrc %session
-# login_cmd           exec /bin/bash -login ~/.xinitrc %session
-login_cmd           exec /bin/zsh -l ~/.xinitrc %session
-
-# Commands executed when starting and exiting a session.
-# They can be used for registering a X11 session with
-# sessreg. You can use the %user variable
-#
-# sessionstart_cmd	some command
-# sessionstop_cmd	some command
-
-# Start in daemon mode. Valid values: yes | no
-# Note that this can be overriden by the command line
-# options "-d" and "-nodaemon"
-# daemon	yes
-
-# Available sessions (first one is the default).
-# The current chosen session name is replaced in the login_cmd
-# above, so your login command can handle different sessions.
-# see the xinitrc.sample file shipped with slim sources
-sessions            foo
-
-# Executed when pressing F11 (requires imagemagick)
-#screenshot_cmd      import -window root /slim.png
-
-# welcome message. Available variables: %host, %domain
-welcome_msg         %host
-
-# Session message. Prepended to the session name when pressing F1
-# session_msg         Session: 
-
-# shutdown / reboot messages
-shutdown_msg       The system is shutting down...
-reboot_msg         The system is rebooting...
-
-# default user, leave blank or remove this line
-# for avoid pre-loading the username.
-#default_user        simone
-
-# Focus the password field on start when default_user is set
-# Set to "yes" to enable this feature
-#focus_password      no
-
-# Automatically login the default user (without entering
-# the password. Set to "yes" to enable this feature
-#auto_login          no
-
-# current theme, use comma separated list to specify a set to 
-# randomly choose from
-#current_theme       default
-current_theme       archlinux-simplyblack
-
-# Lock file
-lockfile            /run/lock/slim.lock
-
-# Log file
-logfile             /var/log/slim.log
-EOF
 }
 
 set_netcfg() {
