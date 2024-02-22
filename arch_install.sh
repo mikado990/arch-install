@@ -69,11 +69,6 @@ VIDEO_DRIVER="i915"
 # For generic stuff
 #VIDEO_DRIVER="vesa"
 
-# Wireless device, leave blank to not use wireless and use DHCP instead.
-WIRELESS_DEVICE="wlan0"
-# For tc4200's
-#WIRELESS_DEVICE="eth1"
-
 setup() {
     local boot="$DRIVE"1
     local swap="$DRIVE"2
@@ -113,6 +108,9 @@ configure() {
     local boot="$DRIVE"1
     local swap="$DRIVE"2
     local root="$DRIVE"3
+
+    echo 'Applying config changes and fixes'
+    config_and_fixes
 
     echo 'Installing additional packages'
     install_packages
@@ -220,6 +218,9 @@ mount_filesystems() {
 install_base() {
     reflector --country 'Poland,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
+    # Enable Paralel downloads for faster downloads (the same is applied after chroot)
+    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/systemd/system.conf
+
     pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages
 }
 
@@ -235,29 +236,37 @@ unmount_filesystems() {
     swapoff "$swap"
 }
 
+config_and_fixes() {
+    hwclock --systohc
+    
+    # Fix long shutdowns
+    sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
+
+    # Enable Colors and Parallel Downloads in pacman
+    sed -i 's/#Color/Color/' /etc/systemd/system.conf
+    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/systemd/system.conf
+}
+
 install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en cpupower cronie git ntp openssh p7zip pkgfile powertop rfkill rsync unrar unzip wget zip'
+    packages+=' alsa-utils aspell-en curl cpupower cronie git ntp openssh pkgfile powertop rfkill rsync'
 
     # Development packages
     #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
 
+    # Files systems acces
+    packages+=' ntfs-3g mtools dosfstools ntfsprogs'
+
+    # Archive tools
+    packages+=' p7zip unrar unzip zip'
+    
     # Netcfg
-    if [ -n "$WIRELESS_DEVICE" ]
-    then
-        packages+=' ifplugd dialog wireless_tools wpa_actiond'
-    fi
-
-    # Java stuff
-    #packages+=' icedtea-web-java7 jdk7-openjdk jre7-openjdk'
-
-    # Libreoffice
-    #packages+=' libreoffice-calc libreoffice-en-US libreoffice-gnome libreoffice-impress libreoffice-writer hunspell-en hyphen-en mythes-en'
+    packages+=' ifplugd dialog wireless_tools wpa_actiond'
 
     # Misc programs
-    packages+=' vlc xscreensaver gparted dosfstools ntfsprogs'
+    packages+=' vlc xscreensaver gparted'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit'
