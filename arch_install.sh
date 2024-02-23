@@ -61,13 +61,9 @@ KEYMAP='pl'
 
 # Choose your video driver
 # For Intel
-VIDEO_DRIVER="i915"
-# For nVidia
-#VIDEO_DRIVER="nouveau"
-# For ATI
-#VIDEO_DRIVER="radeon"
-# For generic stuff
-#VIDEO_DRIVER="vesa"
+VIDEO_DRIVER="intel"
+# For AMD
+#VIDEO_DRIVER="amd"
 
 setup() {
     local boot="$DRIVE"1
@@ -242,19 +238,25 @@ config_and_fixes() {
     # Fix long shutdowns
     sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
 
-    # Enable Colors and Parallel Downloads in pacman
+    # Enable Colors, Parallel Downloads and multilib in pacman
     sed -i 's/#Color/Color/' /etc/systemd/system.conf
     sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/systemd/system.conf
+    sed -i 's/#[multilib]/[multilib]/' /etc/systemd/system.conf
+    sed -i 's/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/' /etc/systemd/system.conf
+
+    # Initilize and populate Keyring
+    pacman-key --init
+    pacman-key --populate archlinux
 }
 
 install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en cpupower cronie git ntp openssh picom pkgfile powertop rfkill rsync'
+    packages+=' alsa-utils aspell-en cpupower cronie ntp openssh picom pkgfile powertop rfkill rsync'
 
     # Development packages
-    #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
+    packages+=' gdb git valgrind'
 
     # Files systems acces
     packages+=' dosfstools exfat-utils ntfs-3g ntfsprogs mtools'
@@ -277,18 +279,12 @@ install_packages() {
     # For laptops
     packages+=' xf86-input-synaptics'
 
-    if [ "$VIDEO_DRIVER" = "i915" ]
+    if [ "$VIDEO_DRIVER" = "intel" ]
     then
-        packages+=' mesa vulkan-intel libva-intel-driver'
-    elif [ "$VIDEO_DRIVER" = "nouveau" ]
+        packages+=' mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver'
+    elif [ "$VIDEO_DRIVER" = "amd" ]
     then
-        packages+=' xf86-video-nouveau'
-    elif [ "$VIDEO_DRIVER" = "radeon" ]
-    then
-        packages+=' xf86-video-ati'
-    elif [ "$VIDEO_DRIVER" = "vesa" ]
-    then
-        packages+=' xf86-video-vesa'
+        packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver'
     fi
 
     pacman -Sy --noconfirm $packages
