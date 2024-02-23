@@ -251,7 +251,7 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en cpupower cronie git ntp openssh pkgfile powertop rfkill rsync'
+    packages+=' alsa-utils aspell-en cpupower cronie git ntp openssh picom pkgfile powertop rfkill rsync'
 
     # Development packages
     #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
@@ -374,7 +374,7 @@ create_user() {
     local name="$1"; shift
     local password="$1"; shift
 
-    useradd -m -G adm,systemd-journal,wheel,rfkill,games,network,video,audio,optical,floppy,storage,scanner,power,adbusers,wireshark "$name"
+    useradd -m -G wheel,rfkill,games,video,audio,storage,kvm "$name"
     echo -en "$password\n$password" | passwd "$name"
 }
 
