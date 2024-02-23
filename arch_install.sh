@@ -251,28 +251,25 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en curl cpupower cronie git ntp openssh pkgfile powertop rfkill rsync'
+    packages+=' alsa-utils aspell-en cpupower cronie git ntp openssh pkgfile powertop rfkill rsync'
 
     # Development packages
     #packages+=' apache-ant cmake gdb git maven mercurial subversion tcpdump valgrind wireshark-gtk'
 
     # Files systems acces
-    packages+=' ntfs-3g mtools dosfstools ntfsprogs'
+    packages+=' dosfstools exfat-utils ntfs-3g ntfsprogs mtools'
 
     # Archive tools
-    packages+=' p7zip unrar unzip zip'
-    
-    # Netcfg
-    packages+=' ifplugd dialog wireless_tools wpa_actiond'
+    packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' vlc xscreensaver gparted'
+    packages+=' dmenu mpv thunar'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit'
 
     # Fonts
-    packages+=' ttf-dejavu ttf-liberation'
+    packages+=' noto-fonts noto-fonts-emoji ttf-dejavu libertinus-font'
 
     # On Intel processors
     packages+=' intel-ucode'
