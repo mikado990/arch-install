@@ -279,7 +279,7 @@ install_packages() {
 
     if [ "$VIDEO_DRIVER" = "i915" ]
     then
-        packages+=' xf86-video-intel libva-intel-driver'
+        packages+=' mesa vulkan-intel libva-intel-driver'
     elif [ "$VIDEO_DRIVER" = "nouveau" ]
     then
         packages+=' xf86-video-nouveau'
