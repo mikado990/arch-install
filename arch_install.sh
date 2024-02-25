@@ -214,7 +214,7 @@ install_base() {
     reflector --country 'Poland,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
     # Enable Paralel downloads for faster downloads (the same is applied after chroot)
-    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/systemd/system.conf
+    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
     pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages
 }
@@ -238,10 +238,8 @@ config_and_fixes() {
     sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
 
     # Enable Colors, Parallel Downloads and multilib in pacman
-    sed -i 's/#Color/Color/' /etc/systemd/system.conf
-    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/systemd/system.conf
-    sed -i 's/#[multilib]/[multilib]/' /etc/systemd/system.conf
-    sed -i 's/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/' /etc/systemd/system.conf
+    sed -i 's/#Color/Color/' /etc/pacman.conf
+    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
     # Initilize and populate Keyring
     pacman-key --init
