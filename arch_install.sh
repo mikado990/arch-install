@@ -101,10 +101,6 @@ setup() {
 }
 
 configure() {
-    local boot="$DRIVE"1
-    local swap="$DRIVE"2
-    local root="$DRIVE"3
-
     echo 'Applying config changes and fixes'
     config_and_fixes
 
@@ -290,7 +286,7 @@ install_packages() {
 install_yay() {
     git clone https://aur.archlinux.org/yay-bin.git
     cd yay-bin
-    makepkg -si --noconfirm --asroot
+    makepkg -si --noconfirm
 
     cd ..
     rm -rf yay-bin
