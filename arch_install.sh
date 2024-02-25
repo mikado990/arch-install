@@ -246,7 +246,7 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils aspell-en cpupower cronie ntp openssh picom pkgfile powertop rfkill rsync'
+    packages+=' alsa-utils pipewire-jack aspell-en cpupower cronie ntp openssh picom pkgfile powertop rfkill rsync'
 
     # Development packages
     packages+=' gdb git valgrind'
@@ -286,7 +286,7 @@ install_packages() {
 install_yay() {
     git clone https://aur.archlinux.org/yay-bin.git
     cd yay-bin
-    makepkg -si --noconfirm
+    runuser -unobody makepkg -si --noconfirm
 
     cd ..
     rm -rf yay-bin
