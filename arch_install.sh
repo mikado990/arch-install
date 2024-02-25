@@ -186,8 +186,7 @@ partition_drive() {
         mkpart swap linux-swap 1000M 9000M \
 	mkpart arch ext4 9000M 100% \
         set 1 esp on \
-        set 2 swap on \
-	set 3 root on
+        set 2 swap on
 }
 
 format_filesystems() {
