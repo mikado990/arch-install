@@ -278,10 +278,10 @@ install_packages() {
 
     if [ "$VIDEO_DRIVER" = "intel" ]
     then
-        packages+=' mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver'
+        packages+=' mesa vulkan-intel intel-media-driver'
     elif [ "$VIDEO_DRIVER" = "amd" ]
     then
-        packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver'
+        packages+=' mesa mesa-vdpau  xf86-video-amdgpu vulkan-radeon libva-mesa-driver'
     fi
 
     pacman -Sy --noconfirm $packages
