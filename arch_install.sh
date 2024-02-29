@@ -45,13 +45,13 @@ DRIVE='/dev/sda'
 HOSTNAME='host100'
 
 # Root password (leave blank to be prompted).
-ROOT_PASSWORD='a'
+ROOT_PASSWORD=''
 
 # Main user to create (by default, added to wheel group, and others).
 USER_NAME='user'
 
 # The main user's password (leave blank to be prompted).
-USER_PASSWORD='a'
+USER_PASSWORD=''
 
 # System timezone.
 TIMEZONE='Europe/Warsaw'
@@ -106,12 +106,6 @@ configure() {
 
     echo 'Installing additional packages'
     install_packages
-
-    echo 'Installing YAY'
-    install_yay
-
-    echo 'Installing AUR packages'
-    install_aur_packages
 
     echo 'Clearing package tarballs'
     clean_packages
@@ -169,6 +163,12 @@ configure() {
     echo 'Building locate database'
     update_locate
 
+    echo 'Installing YAY'
+    install_yay
+
+    echo 'Installing AUR packages'
+    install_aur_packages
+
     rm /setup.sh
 }
 
@@ -207,12 +207,12 @@ mount_filesystems() {
 }
 
 install_base() {
-    reflector --country 'Poland,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+    reflector -a 48 --country 'Poland,' -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 
     # Enable Paralel downloads for faster downloads (the same is applied after chroot)
     sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
-    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages
+    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages --noconfirm --needed
 }
 
 set_fstab() {
@@ -246,7 +246,10 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' alsa-utils pipewire-jack aspell-en cpupower cronie ntp openssh picom pkgfile powertop rfkill rsync'
+    packages+=' aspell-en cpupower cronie ntp openssh pkgfile powertop rfkill rsync'
+
+    # Audio
+    packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
 
     # Development packages
     packages+=' gdb git valgrind'
@@ -258,7 +261,7 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' dmenu mpv thunar'
+    packages+=' mpv thunar'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit'
@@ -280,20 +283,7 @@ install_packages() {
         packages+=' mesa mesa-vdpau  xf86-video-amdgpu vulkan-radeon libva-mesa-driver'
     fi
 
-    pacman -Sy --noconfirm $packages
-}
-
-install_yay() {
-    git clone https://aur.archlinux.org/yay-bin.git
-    cd yay-bin
-    runuser -unobody makepkg -si --noconfirm
-
-    cd ..
-    rm -rf yay-bin
-}
-
-install_aur_packages() {
-    yay -Sy --noconfirm yay-bin onlyoffice-bin floorp-bin --aur
+    pacman -Sy --noconfirm --needed $packages
 }
 
 clean_packages() {
@@ -350,7 +340,7 @@ set_grub() {
 }
 
 set_sudoers() {
-    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 }
 
 set_root_password() {
@@ -369,6 +359,20 @@ create_user() {
 
 update_locate() {
     updatedb
+}
+
+install_yay() {
+    git clone https://aur.archlinux.org/yay-bin.git
+    cd yay-bin
+    su $USER_NAME
+    runuser -unobody makepkg -si --noconfirm
+
+    cd ..
+    rm -rf yay-bin
+}
+
+install_aur_packages() {
+    yay -Sy --noconfirm yay-bin onlyoffice-bin floorp-bin --aur
 }
 
 set -ex
