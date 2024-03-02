@@ -179,8 +179,8 @@ partition_drive() {
     parted -s "$dev" \
         mklabel gpt \
         mkpart boot fat32 1 1000M \
-        mkpart swap linux-swap 1000M 9000M \
-	mkpart arch ext4 9000M 100% \
+        mkpart swap linux-swap 1000M 5000M \
+	mkpart arch ext4 5000M 100% \
         set 1 esp on \
         set 2 swap on
 }
@@ -231,7 +231,7 @@ config_and_fixes() {
     hwclock --systohc
     
     # Fix long shutdowns
-    sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
+    sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 
     # Enable Colors, Parallel Downloads and multilib in pacman
     sed -i 's/#Color/Color/' /etc/pacman.conf
@@ -261,7 +261,7 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' mpv thunar'
+    packages+=' vlc'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit'
@@ -269,11 +269,11 @@ install_packages() {
     # Fonts
     packages+=' noto-fonts noto-fonts-emoji ttf-dejavu libertinus-font'
 
+    # KDE Dektop Environment
+    packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate kmix konsole ktorrent okular partitionmanager plasmatube spectacle'
+
     # On Intel processors
     packages+=' intel-ucode'
-
-    # For laptops
-    packages+=' xf86-input-synaptics'
 
     if [ "$VIDEO_DRIVER" = "intel" ]
     then
@@ -331,7 +331,7 @@ EOF
 #}
 
 set_daemons() {
-    systemctl enable cronie.service cpupower.service ntpd.service NetworkManager.service
+    systemctl enable cronie.service cpupower.service ntpd.service NetworkManager.service sddm.service
 }
 
 set_grub() {
