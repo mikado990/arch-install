@@ -221,11 +221,6 @@ configure() {
     fi
     echo 'Creating initial user'
     create_user "$USER_NAME" "$USER_PASSWORD"
-
-    echo 'Building locate database'
-    update_locate
-
-    rm /setup.sh
 }
 
 config_and_fixes() {
@@ -358,10 +353,6 @@ create_user() {
     echo -en "$password\n$password" | passwd "$name"
 }
 
-update_locate() {
-    updatedb
-}
-
 #---------------------------------------------------------
 # This part is chroot ad user just to install AUR
 #---------------------------------------------------------
@@ -369,9 +360,12 @@ update_locate() {
 aur() {
     install_yay
     install_aur_packages
+
+    rm /setup.sh
 }
     
 install_yay() {
+    cd
     git clone https://aur.archlinux.org/yay-bin.git
     cd yay-bin
     makepkg -si --noconfirm
@@ -381,7 +375,7 @@ install_yay() {
 }
 
 install_aur_packages() {
-    yay -Sy --noconfirm yay-bin onlyoffice-bin librewolf-bin --aur
+    yay -S --noconfirm --needed yay-bin onlyoffice-bin librewolf-bin
 }
 
 set -ex
