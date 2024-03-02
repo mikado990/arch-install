@@ -74,6 +74,8 @@ VIDEO_DRIVER="intel"
 #----------------------------------------------------------
 
 setup() {
+    timedatectl set-ntp true
+    
     if [[ "${DISK}" =~ "nvme" ]]; then
         boot="$DRIVE"p1
         swap="$DRIVE"p2
@@ -257,7 +259,7 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' aspell-en cpupower cronie ntp openssh pkgfile powertop rfkill rsync'
+    packages+=' aspell-en cpupower cronie ntp openssh pkgfile powertop reflector rfkill rsync'
 
     # Audio
     packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
