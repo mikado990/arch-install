@@ -116,11 +116,11 @@ setup() {
 partition_drive() {
     local dev="$1"; shift
 
-    # 1000 MB /boot partition, 4000MB swap and rest for the system
+    # 1000 MB /boot partition, 8000MB swap and rest for the system
     parted -s "$dev" \
         mklabel gpt \
         mkpart boot fat32 1 1000M \
-        mkpart swap linux-swap 1000M 5000M \
+        mkpart swap linux-swap 1000M 9000M \
 	mkpart arch ext4 5000M 100% \
         set 1 esp on \
         set 2 swap on
