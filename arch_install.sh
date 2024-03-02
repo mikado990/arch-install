@@ -38,6 +38,10 @@
 ## CONFIGURE THESE VARIABLES
 ## ALSO LOOK AT THE install_packages FUNCTION TO SEE WHAT IS ACTUALLY INSTALLED
 
+#----------------------------------------------------------
+# This part sets up all the variables 
+#----------------------------------------------------------
+
 # Drive to install to.
 DRIVE='/dev/sda'
 
@@ -65,6 +69,10 @@ VIDEO_DRIVER="intel"
 # For AMD
 #VIDEO_DRIVER="amd"
 
+#----------------------------------------------------------
+# This script is responsible for setup before chrooting
+#----------------------------------------------------------
+
 setup() {
     local boot="$DRIVE"1
     local swap="$DRIVE"2
@@ -89,16 +97,70 @@ setup() {
     cp $0 /mnt/setup.sh
     arch-chroot /mnt ./setup.sh chroot
 
-    if [ -f /mnt/setup.sh ]
-    then
-        echo 'ERROR: Something failed inside the chroot, not unmounting filesystems so you can investigate.'
-        echo 'Make sure you unmount everything before you try to run this script again.'
-    else
-        echo 'Unmounting filesystems'
-        unmount_filesystems "$swap"
-        echo 'Done! Reboot system.'
-    fi
+    echo 'Chrooting as user: "$USER_NAME" to install AUR helper and packages'
+    arch-chroot /mnt /usr/bin/runuser -u $USER_NAME ./setup.sh aur
+
+    echo 'Unmounting everything from /mnt'
+    unmount_filesystems
 }
+
+partition_drive() {
+    local dev="$1"; shift
+
+    # 1000 MB /boot partition, 4000MB swap and rest for the system
+    parted -s "$dev" \
+        mklabel gpt \
+        mkpart boot fat32 1 1000M \
+        mkpart swap linux-swap 1000M 5000M \
+	mkpart arch ext4 5000M 100% \
+        set 1 esp on \
+        set 2 swap on
+}
+
+format_filesystems() {
+    local boot="$1"; shift
+    local swap="$1"; shift
+    local root="$1"; shift
+
+    mkfs.fat -F32 "$boot"
+    mkswap "$swap"
+    mkfs.ext4 "$root"
+}
+
+mount_filesystems() {
+    local boot="$1"; shift
+    local swap="$1"; shift
+    local root="$1"; shift
+
+    mount "$root" /mnt
+    mkdir /mnt/boot
+    mount "$boot" /mnt/boot
+    swapon "$swap"
+}
+
+install_base() {
+    reflector -a 48 --country 'Poland,' -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+
+    # Enable Paralel downloads for faster downloads (the same is applied after chroot)
+    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
+
+    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages --noconfirm --needed
+}
+
+set_fstab() {
+    genfstab -U /mnt >> /mnt/etc/fstab
+}
+
+unmount_filesystems() {
+    local swap="$1"; shift
+    
+    umount -R /mnt
+    swapoff "$swap"
+}
+
+#-------------------------------------------------------------------------
+# This part is for configurtion inside chroot
+#-------------------------------------------------------------------------
 
 configure() {
     echo 'Applying config changes and fixes'
@@ -163,68 +225,7 @@ configure() {
     echo 'Building locate database'
     update_locate
 
-    echo 'Installing YAY'
-    install_yay
-
-    echo 'Installing AUR packages'
-    install_aur_packages
-
     rm /setup.sh
-}
-
-partition_drive() {
-    local dev="$1"; shift
-
-    # 1000 MB /boot partition, 8000MB swap and rest for the system
-    parted -s "$dev" \
-        mklabel gpt \
-        mkpart boot fat32 1 1000M \
-        mkpart swap linux-swap 1000M 5000M \
-	mkpart arch ext4 5000M 100% \
-        set 1 esp on \
-        set 2 swap on
-}
-
-format_filesystems() {
-    local boot="$1"; shift
-    local swap="$1"; shift
-    local root="$1"; shift
-
-    mkfs.fat -F32 "$boot"
-    mkswap "$swap"
-    mkfs.ext4 "$root"
-}
-
-mount_filesystems() {
-    local boot="$1"; shift
-    local swap="$1"; shift
-    local root="$1"; shift
-
-    mount "$root" /mnt
-    mkdir /mnt/boot
-    mount "$boot" /mnt/boot
-    swapon "$swap"
-}
-
-install_base() {
-    reflector -a 48 --country 'Poland,' -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-
-    # Enable Paralel downloads for faster downloads (the same is applied after chroot)
-    sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
-
-    pacstrap -K /mnt base base-devel linux-firmware linux-zen linux-zen-headers networkmanager grub efibootmgr vim man-db man-pages --noconfirm --needed
-}
-
-set_fstab() {
-    genfstab -U /mnt >> /mnt/etc/fstab
-}
-
-unmount_filesystems() {
-    local swap="$1"; shift
-    
-    umount /mnt/boot
-    umount /mnt
-    swapoff "$swap"
 }
 
 config_and_fixes() {
@@ -361,25 +362,34 @@ update_locate() {
     updatedb
 }
 
+#---------------------------------------------------------
+# This part is chroot ad user just to install AUR
+#---------------------------------------------------------
+
+aur() {
+    install_yay
+    install_aur_packages
+}
+    
 install_yay() {
     git clone https://aur.archlinux.org/yay-bin.git
     cd yay-bin
-    su $USER_NAME
-    runuser -unobody makepkg -si --noconfirm
+    makepkg -si --noconfirm
 
     cd ..
     rm -rf yay-bin
 }
 
 install_aur_packages() {
-    yay -Sy --noconfirm yay-bin onlyoffice-bin floorp-bin --aur
+    yay -Sy --noconfirm yay-bin onlyoffice-bin librewolf-bin --aur
 }
 
 set -ex
 
-if [ "$1" == "chroot" ]
-then
+if [ "$1" == "chroot" ]; then
     configure
+elif [ "$1" == "aur" ]; then
+    aur
 else
     setup
 fi
