@@ -76,7 +76,7 @@ VIDEO_DRIVER="intel"
 setup() {
     timedatectl set-ntp true
     
-    if [[ "${DISK}" =~ "nvme" ]]; then
+    if [[ "${DRIVE}" =~ "nvme" ]]; then
         boot="$DRIVE"p1
         swap="$DRIVE"p2
         root="$DRIVE"p3
@@ -121,7 +121,7 @@ partition_drive() {
         mklabel gpt \
         mkpart boot fat32 1 1000M \
         mkpart swap linux-swap 1000M 9000M \
-	mkpart arch ext4 5000M 100% \
+	mkpart arch ext4 9000M 100% \
         set 1 esp on \
         set 2 swap on
 }
@@ -230,6 +230,9 @@ configure() {
     fi
     echo 'Creating initial user'
     create_user "$USER_NAME" "$USER_PASSWORD"
+
+    # Change owner of the script file so that the next function can delete the file
+    chown $USER_NAME:$USERNAME /setup.sh
 }
 
 config_and_fixes() {
