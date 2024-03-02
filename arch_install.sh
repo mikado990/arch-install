@@ -74,10 +74,17 @@ VIDEO_DRIVER="intel"
 #----------------------------------------------------------
 
 setup() {
-    local boot="$DRIVE"1
-    local swap="$DRIVE"2
-    local root="$DRIVE"3
-
+    if [[ "${DISK}" =~ "nvme" ]]; then
+        boot="$DRIVE"p1
+        swap="$DRIVE"p2
+        root="$DRIVE"p3
+	
+    else
+        boot="$DRIVE"1
+        swap="$DRIVE"2
+        root="$DRIVE"3
+    fi
+    
     echo 'Creating partitions'
     partition_drive "$DRIVE"
 
@@ -233,6 +240,14 @@ config_and_fixes() {
     sed -i 's/#Color/Color/' /etc/pacman.conf
     sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
+    #Enable multilib
+    sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+
+    # Set make flags to use more cores
+    nc=$(grep -c ^processor /proc/cpuinfo)
+    sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
+    sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
+
     # Initilize and populate Keyring
     pacman-key --init
     pacman-key --populate archlinux
@@ -266,7 +281,7 @@ install_packages() {
     packages+=' noto-fonts noto-fonts-emoji ttf-dejavu libertinus-font'
 
     # KDE Dektop Environment
-    packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate kmix konsole ktorrent okular partitionmanager plasmatube spectacle'
+    packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
 
     # On Intel processors
     packages+=' intel-ucode'
@@ -305,7 +320,7 @@ set_timezone() {
 set_locale() {
     echo 'LANG="en_US.UTF-8"' >> /etc/locale.conf
     echo 'LC_COLLATE="C"' >> /etc/locale.conf
-    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+    sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
     locale-gen
 }
 
