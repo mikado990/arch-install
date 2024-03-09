@@ -288,6 +288,9 @@ install_packages() {
     # KDE Dektop Environment
     packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
 
+    # Virtualization
+    packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 spice spice-vdagent'
+
     # On Intel processors
     packages+=' intel-ucode'
 
@@ -347,7 +350,7 @@ EOF
 #}
 
 set_daemons() {
-    systemctl enable cronie.service cpupower.service ntpd.service NetworkManager.service sddm.service
+    systemctl enable cronie.service cpupower.service ntpd.service NetworkManager.service sddm.service libvirtd.socket
 }
 
 set_grub() {
@@ -369,7 +372,7 @@ create_user() {
     local name="$1"; shift
     local password="$1"; shift
 
-    useradd -m -G wheel,rfkill,games,video,audio,storage,kvm "$name"
+    useradd -m -G wheel,rfkill,games,video,audio,storage,kvm,libvirt,libvirt-qemu "$name"
     echo -en "$password\n$password" | passwd "$name"
 }
 
