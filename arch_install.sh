@@ -289,7 +289,7 @@ install_packages() {
     packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
 
     # Virtualization
-    packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 spice spice-vdagent'
+    packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 qemu-hw-display-qxl spice spice-vdagent'
 
     # On Intel processors
     packages+=' intel-ucode'
