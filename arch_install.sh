@@ -46,7 +46,7 @@
 DRIVE='/dev/sda'
 
 # Hostname of the installed machine.
-HOSTNAME='host100'
+HOSTNAME='arch'
 
 # Root password (leave blank to be prompted).
 ROOT_PASSWORD=''
@@ -60,14 +60,8 @@ USER_PASSWORD=''
 # System timezone.
 TIMEZONE='Europe/Warsaw'
 
+# Keymap
 KEYMAP='pl'
-# KEYMAP='dvorak'
-
-# Choose your video driver
-# For Intel
-VIDEO_DRIVER="intel"
-# For AMD
-#VIDEO_DRIVER="amd"
 
 #----------------------------------------------------------
 # This script is responsible for setup before chrooting
@@ -181,8 +175,8 @@ configure() {
     echo 'Clearing package tarballs'
     clean_packages
 
-    echo 'Updating pkgfile database'
-    update_pkgfile
+    #echo 'Updating pkgfile database'
+    #update_pkgfile
 
     echo 'Setting hostname'
     set_hostname "$HOSTNAME"
@@ -262,13 +256,13 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' aspell-en cpupower cronie ntp openssh pkgfile powertop reflector rfkill rsync'
+    packages+=' ntp openssh git'
 
     # Audio
     packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
 
     # Development packages
-    packages+=' gdb git valgrind'
+    #packages+=' gdb valgrind'
 
     # Files systems acces
     packages+=' dosfstools exfat-utils ntfs-3g ntfsprogs mtools'
@@ -277,10 +271,10 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' vlc'
+    packages+=' vlc freecad librecad'
 
     # Xserver
-    packages+=' xorg-apps xorg-server xorg-xinit'
+    #packages+=' xorg-apps xorg-server xorg-xinit'
 
     # Fonts
     packages+=' noto-fonts noto-fonts-emoji ttf-dejavu libertinus-font'
@@ -289,29 +283,27 @@ install_packages() {
     packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
 
     # Virtualization
-    packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 qemu-hw-display-qxl spice spice-vdagent'
+    #packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 qemu-hw-display-qxl spice spice-vdagent'
 
-    # On Intel processors
-    packages+=' intel-ucode'
+    # CPU ucode
+    packages+=' amd-ucode'
+    
+    # GPU drivers
+    packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader'
 
-    if [ "$VIDEO_DRIVER" = "intel" ]
-    then
-        packages+=' mesa vulkan-intel intel-media-driver'
-    elif [ "$VIDEO_DRIVER" = "amd" ]
-    then
-        packages+=' mesa mesa-vdpau  xf86-video-amdgpu vulkan-radeon libva-mesa-driver'
-    fi
+    # Lutris and Wine
+    packages+=' lutris wine-staging giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls mpg123 lib32-mpg123 openal lib32-openal v4l-utils lib32-v4l-utils libpulse lib32-libpulse libgpg-error lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjpeg-turbo lib32-libjpeg-turbo sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs'
 
-    pacman -Sy --noconfirm --needed $packages
+    pacman -Sy --needed $packages
 }
 
 clean_packages() {
     yes | pacman -Scc
 }
 
-update_pkgfile() {
-    pkgfile -u
-}
+#update_pkgfile() {
+#    pkgfile -u
+#}
 
 set_hostname() {
     local hostname="$1"; shift
@@ -350,11 +342,11 @@ EOF
 #}
 
 set_daemons() {
-    systemctl enable cronie.service cpupower.service ntpd.service NetworkManager.service sddm.service libvirtd.socket
+    systemctl enable ntpd.service NetworkManager.service sddm.service
 }
 
 set_grub() {
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch
     grub-mkconfig -o /boot/grub/grub.cfg
 }
 
@@ -372,7 +364,7 @@ create_user() {
     local name="$1"; shift
     local password="$1"; shift
 
-    useradd -m -G wheel,rfkill,games,video,audio,storage,kvm,libvirt,libvirt-qemu "$name"
+    useradd -m -G wheel,rfkill,games,video,audio,storage,kvm "$name"
     echo -en "$password\n$password" | passwd "$name"
 }
 
@@ -398,7 +390,7 @@ install_yay() {
 }
 
 install_aur_packages() {
-    yay -S --noconfirm --needed yay-bin onlyoffice-bin librewolf-bin
+    yay -S --needed yay-bin onlyoffice-bin librewolf-bin heroic-games-launcher-bin
 }
 
 set -ex
