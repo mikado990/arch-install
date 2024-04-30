@@ -271,7 +271,7 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' vlc freecad librecad'
+    packages+=' vlc freecad librecad mangohud lib32-mangohud gamemode lib32-gamemode discord gamescope steam'
 
     # Xserver
     #packages+=' xorg-apps xorg-server xorg-xinit'
