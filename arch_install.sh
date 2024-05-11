@@ -114,8 +114,8 @@ partition_drive() {
     parted -s "$dev" \
         mklabel gpt \
         mkpart boot fat32 1 1000M \
-        mkpart swap linux-swap 1000M 9000M \
-	mkpart arch ext4 9000M 100% \
+        mkpart swap linux-swap 1000M 4000M \
+	mkpart arch ext4 4000M 100% \
         set 1 esp on \
         set 2 swap on
 }
@@ -224,9 +224,6 @@ configure() {
     fi
     echo 'Creating initial user'
     create_user "$USER_NAME" "$USER_PASSWORD"
-
-    # Change owner of the script file so that the next function can delete the file
-    chown $USER_NAME:$USERNAME /setup.sh
 }
 
 config_and_fixes() {
@@ -256,10 +253,10 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' ntp openssh git'
+    packages+=' ntp openssh git alsa-utils fontconfig zsh'
 
     # Audio
-    packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
+    #packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
 
     # Development packages
     #packages+=' gdb valgrind'
@@ -271,25 +268,37 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' vlc freecad librecad mangohud lib32-mangohud gamemode lib32-gamemode discord gamescope steam'
+    #packages+=' vlc freecad librecad'
+
+    # Gaming
+    packages+=' mangohud lib32-mangohud gamemode lib32-gamemode discord gamescope steam'
 
     # Xserver
-    #packages+=' xorg-apps xorg-server xorg-xinit'
+    packages+=' xorg-apps xorg-server xorg-xinit'
 
     # Fonts
-    packages+=' noto-fonts noto-fonts-emoji ttf-dejavu libertinus-font'
+    packages+=' noto-fonts noto-fonts-emoji ttf-dejavu terminus-font libertinus-font'
+
+    # DWM dependencies
+    packages+=' freetype2 libx11 libxft'
 
     # KDE Dektop Environment
-    packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
+    #packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
 
     # Virtualization
     #packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 qemu-hw-display-qxl spice spice-vdagent'
 
     # CPU ucode
-    packages+=' amd-ucode'
+    packages+=' intel-ucode'
+        
+    # GPU drivers Intel
+    packages+=' mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver'
+        
+    # GPU drivers NVIDIA
+    #packages+=' mesa lib32-mesa nvidia-utils'
     
-    # GPU drivers
-    packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader'
+    # GPU drivers Radeon
+    #packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader'
 
     # Lutris and Wine
     packages+=' lutris wine-staging giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls mpg123 lib32-mpg123 openal lib32-openal v4l-utils lib32-v4l-utils libpulse lib32-libpulse libgpg-error lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjpeg-turbo lib32-libjpeg-turbo sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs'
@@ -342,7 +351,7 @@ EOF
 #}
 
 set_daemons() {
-    systemctl enable ntpd.service NetworkManager.service sddm.service
+    systemctl enable ntpd.service NetworkManager.service
 }
 
 set_grub() {
@@ -375,8 +384,6 @@ create_user() {
 aur() {
     install_yay
     install_aur_packages
-
-    rm /setup.sh
 }
     
 install_yay() {
@@ -390,7 +397,7 @@ install_yay() {
 }
 
 install_aur_packages() {
-    yay -S --needed yay-bin onlyoffice-bin librewolf-bin heroic-games-launcher-bin
+    yay -S --needed yay-bin librewolf-bin heroic-games-launcher-bin
 }
 
 set -ex
