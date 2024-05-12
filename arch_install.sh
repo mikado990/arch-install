@@ -253,25 +253,22 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' ntp openssh git alsa-utils fontconfig zsh'
+    packages+=' ntp openssh git fontconfig'
 
     # Audio
-    #packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
-
-    # Development packages
-    #packages+=' gdb valgrind'
+    packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
 
     # Files systems acces
-    packages+=' dosfstools exfat-utils ntfs-3g ntfsprogs mtools'
+    packages+=' cifs-utils dosfstools exfat-utils ntfs-3g ntfsprogs mtools'
 
     # Archive tools
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    #packages+=' vlc freecad librecad'
+    packages+=' mpv thunar dunst picom htop spotify-launcher newsboat zathura zathura-djvu zathura-pdf-mupdf tesseract-data-pol'
 
     # Gaming
-    packages+=' mangohud lib32-mangohud gamemode lib32-gamemode discord gamescope steam'
+    packages+=' mangohud lib32-mangohud gamemode lib32-gamemode gamescope steam'
 
     # Xserver
     packages+=' xorg-apps xorg-server xorg-xinit'
@@ -282,12 +279,6 @@ install_packages() {
     # DWM dependencies
     packages+=' freetype2 libx11 libxft'
 
-    # KDE Dektop Environment
-    #packages+=' sddm plasma ark dolphin dolphin-plugins gwenview kate konsole okular partitionmanager spectacle qbittorrent'
-
-    # Virtualization
-    #packages+=' libvirt virt-manager iptabls-nft dnsmasq qemu-img qemu-system-x86 qemu-hw-display-qxl spice spice-vdagent'
-
     # CPU ucode
     packages+=' intel-ucode'
         
@@ -295,7 +286,7 @@ install_packages() {
     packages+=' mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver'
         
     # GPU drivers NVIDIA
-    #packages+=' mesa lib32-mesa nvidia-utils'
+    #packages+=' mesa lib32-mesa nvidia-utils lib32-nvidia-utils nvidia-dkms'
     
     # GPU drivers Radeon
     #packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader'
