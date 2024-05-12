@@ -1,0 +1,20 @@
+set number relativenumber
+syntax on
+
+" Move .viminfo file
+set viminfo+=n~/.local/share/viminfo
+
+" Highlight search
+set hlsearch
+set incsearch
+
+" Set tabs and indent
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+
+" Format and encoding
+set fileformat=unix
+set encoding=utf-8
