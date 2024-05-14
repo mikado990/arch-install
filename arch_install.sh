@@ -253,7 +253,7 @@ install_packages() {
     local packages=''
 
     # General utilities/libraries
-    packages+=' ntp openssh git fontconfig'
+    packages+=' ntp brightnessctl openssh git fontconfig'
 
     # Audio
     packages+=' pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber'
@@ -265,13 +265,13 @@ install_packages() {
     packages+=' atool p7zip unrar unzip zip'
 
     # Misc programs
-    packages+=' mpv thunar dunst picom htop spotify-launcher newsboat zathura zathura-djvu zathura-pdf-mupdf tesseract-data-pol'
+    packages+=' mpv nsxiv thunar dunst picom htop spotify-launcher newsboat zathura zathura-djvu zathura-pdf-mupdf tesseract-data-pol'
 
     # Gaming
     packages+=' mangohud lib32-mangohud gamemode lib32-gamemode gamescope steam'
 
     # Xserver
-    packages+=' xorg-apps xorg-server xorg-xinit'
+    packages+=' xorg-apps xorg-server xorg-xinit xwallpaper'
 
     # Fonts
     packages+=' noto-fonts noto-fonts-emoji ttf-dejavu terminus-font libertinus-font'
@@ -286,7 +286,7 @@ install_packages() {
     packages+=' mesa lib32-mesa vulkan-intel lib32-vulkan-intel intel-media-driver'
         
     # GPU drivers NVIDIA
-    #packages+=' mesa lib32-mesa nvidia-utils lib32-nvidia-utils nvidia-dkms'
+    packages+=' mesa lib32-mesa nvidia-utils lib32-nvidia-utils nvidia-dkms'
     
     # GPU drivers Radeon
     #packages+=' mesa lib32-mesa mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader'
