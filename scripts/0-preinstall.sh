@@ -11,7 +11,7 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c 'Poland,' -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 mkdir /mnt &>/dev/null # Hiding error message if any
 echo -ne "
 -------------------------------------------------------------------------
@@ -121,7 +121,7 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
-pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware vim grub efibootmgr network-manager man-db man-pages archlinux-keyring
+pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware vim grub efibootmgr networkmanager man-db man-pages archlinux-keyring
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 cp -R ${SCRIPT_DIR} /mnt/root/arch-install
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist

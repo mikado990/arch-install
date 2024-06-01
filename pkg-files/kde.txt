@@ -13,3 +13,4 @@ qbittorrent
 vlc
 flatpak
 flatpak-kcm
+ufw

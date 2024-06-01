@@ -48,6 +48,8 @@ systemctl stop dhcpcd.service
 echo "  DHCP stopped"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
+systemctl enable ufw.service
+echo "  Firewall enabled"
 
 echo -ne "
 -------------------------------------------------------------------------

@@ -29,12 +29,10 @@ echo -ne "
 "
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
-timedatectl --no-ask-password set-timezone ${TIMEZONE}
-timedatectl --no-ask-password set-ntp 1
-localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_TIME="en_US.UTF-8"
-ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 # Set keymaps
-localectl --no-ask-password set-keymap ${KEYMAP}
+echo "KEYMAP=pl" > /etc/vconsole.conf
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
@@ -84,16 +82,8 @@ elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
     pacman -S --needed --noconfirm intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
 fi
 
-if lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacman -S --noconfirm --needed mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader
-elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
-    pacman -S --noconfirm --needed intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacman -S --needed --noconfirm intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-fi
-
 #SETUP IS WRONG THIS IS RUN
-if ! source $HOME/ArchTitus/configs/setup.conf; then
+if ! source $HOME/arch-install/configs/setup.conf; then
 	# Loop through user input until the user gives a valid username
 	while true
 	do 
@@ -107,11 +97,11 @@ if ! source $HOME/ArchTitus/configs/setup.conf; then
 		echo "Incorrect username."
 	done 
 # convert name to lowercase before saving to setup.conf
-echo "username=${username,,}" >> ${HOME}/ArchTitus/configs/setup.conf
+echo "username=${username,,}" >> ${HOME}/arch-install/configs/setup.conf
 
     #Set Password
     read -p "Please enter password:" password
-echo "password=${password,,}" >> ${HOME}/ArchTitus/configs/setup.conf
+echo "password=${password,,}" >> ${HOME}/arch-install/configs/setup.conf
 
     # Loop through user input until the user gives a valid hostname, but allow the user to force save 
 	while true
@@ -130,7 +120,7 @@ echo "password=${password,,}" >> ${HOME}/ArchTitus/configs/setup.conf
 		fi 
 	done 
 
-    echo "NAME_OF_MACHINE=${name_of_machine,,}" >> ${HOME}/ArchTitus/configs/setup.conf
+    echo "NAME_OF_MACHINE=${name_of_machine,,}" >> ${HOME}/arch-install/configs/setup.conf
 fi
 echo -ne "
 -------------------------------------------------------------------------
@@ -147,7 +137,7 @@ if [ $(whoami) = "root"  ]; then
 
 	cp -R $HOME/arch-install /home/$USERNAME/
     chown -R $USERNAME: /home/$USERNAME/arch-install
-    echo "ArchTitus copied to home directory"
+    echo "arch-install copied to home directory"
 
 # enter $NAME_OF_MACHINE to /etc/hostname
 	echo $NAME_OF_MACHINE > /etc/hostname

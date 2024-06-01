@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $HOME/ArchTitus/configs/setup.conf
+source $HOME/arch-install/configs/setup.conf
 
 cd ~
 mkdir "/home/$USERNAME/.cache"
@@ -11,20 +11,20 @@ mkdir -p "/home/$USERNAME/.local/state/bash"
 mkdir -p "/home/$USERNAME/.local/share/wineprefixes"
 
 cp -r ~/arch-install/configs/.config/* ~/.config/
-cp -rf ~/arch-install/configs/.basrh ~/
+cp -rf ~/arch-install/configs/.bashrc ~/
 cp -rf ~/arch-install/configs/.bash_profile ~/
 
 packages=''
 
 while IFS=read -r line ; do
     packages+=" ${line}"
-done < pacman-pkgs.txt
+done < $HOME/arch-install/sripts/pacman-pkgs.txt
 
 while IFS=read -r line ; do
     packages+=" ${line}"
-done < ${DESKTOP_ENV}.txt
+done < $HOME/arch-install/sripts/${DESKTOP_ENV}.txt
 
-sudo pacman -S --needed $packages
+sudo pacman -S --needed --noconfirm $packages
 
 if [[ ! $AUR_HELPER == none ]]; then
   cd ~
