@@ -12,3 +12,5 @@ partitionmanager
 spectacle
 qbittorrent
 vlc
+flatpak
+flatpak-kcm
