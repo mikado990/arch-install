@@ -1,0 +1,14 @@
+plasma
+ark
+dolphin
+dolphin-plugins
+gwenview
+kate
+kmix
+kolourpaint
+konsole
+okular
+partitionmanager
+spectacle
+qbittorrent
+vlc
