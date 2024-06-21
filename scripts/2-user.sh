@@ -18,11 +18,11 @@ packages=''
 
 while IFS=read -r line ; do
     packages+=" ${line}"
-done < $HOME/arch-install/sripts/pacman-pkgs.txt
+done < $HOME/arch-install/pkg-files/pacman-pkgs.txt
 
 while IFS=read -r line ; do
     packages+=" ${line}"
-done < $HOME/arch-install/sripts/${DESKTOP_ENV}.txt
+done < $HOME/arch-install/pkg-files/${DESKTOP_ENV}.txt
 
 sudo pacman -S --needed --noconfirm $packages
 
@@ -33,9 +33,9 @@ if [[ ! $AUR_HELPER == none ]]; then
   makepkg -si --noconfirm
 fi
 
-#while IFS=read -r line ; do
-#    packages+=" ${line}"
-#done < aur-pkgs.txt
+while IFS=read -r line ; do
+    packages+=" ${line}"
+done < $HOME/arch-install/pkg-files/aur-pkgs.txt
 
 export PATH=$PATH:~/.local/bin
 
