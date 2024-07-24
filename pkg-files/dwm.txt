@@ -2,11 +2,8 @@ xorg-apps
 xorg-server
 xorg-xinit
 xwallpaper
-brightnessctl
 mpv
 nsxiv
-thunar
-thunar-volman
 dunst
 htop
 newsboat
@@ -16,3 +13,4 @@ tesseract-data-pol
 freetype2
 libx11
 libxft
+libxinerama
