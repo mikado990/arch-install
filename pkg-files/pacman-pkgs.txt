@@ -2,6 +2,7 @@ ntp
 openssh
 git
 neovim
+flatpak
 fontconfig
 noto-fonts
 noto-fonts-emoji
