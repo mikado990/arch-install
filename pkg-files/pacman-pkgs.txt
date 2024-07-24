@@ -1,6 +1,7 @@
 ntp
 openssh
 git
+neovim
 fontconfig
 noto-fonts
 noto-fonts-emoji
@@ -10,11 +11,6 @@ ttf-hack
 ttf-roboto
 terminus-font
 libertinus-font
-pipewire
-pipewire-alsa
-pipewire-pulse
-pipewire-jack
-wireplumber
 cifs-utils
 dosfstools
 exfat-utils
@@ -31,7 +27,6 @@ mangohud
 lib32-mangohud
 gamemode
 lib32-gamemode
-gamescope
 steam
 mesa
 lib32-mesa
