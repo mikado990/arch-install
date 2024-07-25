@@ -16,11 +16,11 @@ cp -rf $HOME/arch-install/configs/.bashrc /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/.bash_profile /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/Pictures /home/$USERNAME/
 
-while IFS=read -r line ; do
+while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/pacman-pkgs.txt
 
-while IFS=read -r line ; do
+while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/${DESKTOP_ENV}.txt
 
@@ -33,7 +33,7 @@ if [[ ! $AUR_HELPER == none ]]; then
   makepkg -si --noconfirm
 fi
 
-while IFS=read -r line ; do
+while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/aur-pkgs.txt
 

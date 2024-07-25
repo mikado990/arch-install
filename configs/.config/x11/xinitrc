@@ -2,19 +2,17 @@
 
 setxkbmap -layout pl
 xwallpaper --zoom ~/Pictures/bg.jpg
-/usr/bin/prime-offload
 
 dunst &
 
 while true
 do
-	LIGHT="💡 $(brightnessctl -m | awk -F, '{print $4}')"
 	VOL="🔊 $(amixer get Master | tail -1 | sed 's/.*\[\([0-9]*%\)\].*/\1/')"
     TIME=$(date +"%d.%m.%Y %H:%M")
     WIFI="$(awk '/^\s*w/ { print "📶", int($3 * 100 / 70) "% " }' /proc/net/wireless)"
 	BAT="🔋 $(cat /sys/class/power_supply/BAT1/capacity)%"
 
-	xsetroot -name "$LIGHT | $VOL | $WIFI | $BAT | $TIME"
+	xsetroot -name "$VOL | $WIFI | $BAT | $TIME"
 	sleep 30s
 done &
 

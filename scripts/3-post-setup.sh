@@ -39,17 +39,12 @@ echo -ne "
                     Enabling Essential Services
 -------------------------------------------------------------------------
 "
-ntpd -qg
 systemctl enable ntpd.service
 echo "  NTP enabled"
 systemctl disable dhcpcd.service
 echo "  DHCP disabled"
-systemctl stop dhcpcd.service
-echo "  DHCP stopped"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
-systemctl enable ufw.service
-echo "  Firewall enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
