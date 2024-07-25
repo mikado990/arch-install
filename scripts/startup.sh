@@ -175,22 +175,24 @@ select_option() {
 }
 
 filesystem () {
-echo -ne "
-Please Select your file system for both boot and root
-"
-options=("btrfs" "ext4" "luks" "exit")
-select_option $? 1 "${options[@]}"
+set_option FS ext4
 
-case $? in
-0) set_option FS btrfs;;
-1) set_option FS ext4;;
-2) 
-    set_password "LUKS_PASSWORD"
-    set_option FS luks
-    ;;
-3) exit ;;
-*) echo "Wrong option please select again"; filesystem;;
-esac
+#echo -ne "
+#Please Select your file system for both boot and root
+#"
+#options=("btrfs" "ext4" "luks" "exit")
+#select_option $? 1 "${options[@]}"
+#
+#case $? in
+#0) set_option FS btrfs;;
+#1) set_option FS ext4;;
+#2)
+#    set_password "LUKS_PASSWORD"
+#    set_option FS luks
+#    ;;
+#3) exit ;;
+#*) echo "Wrong option please select again"; filesystem;;
+#esac
 }
 
 timezone () {
@@ -229,22 +231,22 @@ keymap () {
 set_option KEYMAP pl
 }
 
-drivessd () {
-echo -ne "
-Is this an ssd? yes/no:
-"
-
-options=("Yes" "No")
-select_option $? 1 "${options[@]}"
-
-case ${options[$?]} in
-    y|Y|yes|Yes|YES)
-    set_option MOUNT_OPTIONS "noatime,compress=zstd,ssd,commit=120";;
-    n|N|no|NO|No)
-    set_option MOUNT_OPTIONS "noatime,compress=zstd,commit=120";;
-    *) echo "Wrong option. Try again";drivessd;;
-esac
-}
+#drivessd () {
+#echo -ne "
+#Is this an ssd? yes/no:
+#"
+#
+#options=("Yes" "No")
+#select_option $? 1 "${options[@]}"
+#
+#case ${options[$?]} in
+#    y|Y|yes|Yes|YES)
+#    set_option MOUNT_OPTIONS "noatime,compress=zstd,ssd,commit=120";;
+#    n|N|no|NO|No)
+#    set_option MOUNT_OPTIONS "noatime,compress=zstd,commit=120";;
+#    *) echo "Wrong option. Try again";drivessd;;
+#esac
+#}
 
 diskpart () {
 PS3='
@@ -257,7 +259,6 @@ disk=${options[$?]%|*}
 echo -e "\n${disk%|*} selected \n"
     set_option DISK ${disk%|*}
 
-drivessd
 }
 
 userinfo () {

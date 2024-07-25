@@ -18,7 +18,7 @@ echo -ne "
                     Installing Prerequisites
 -------------------------------------------------------------------------
 "
-pacman -S --noconfirm --needed gptfdisk btrfs-progs glibc
+pacman -S --noconfirm --needed gptfdisk glibc
 echo -ne "
 -------------------------------------------------------------------------
                     Formating Disk
@@ -43,35 +43,35 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # @description Creates the btrfs subvolumes.
-createsubvolumes () {
-    btrfs subvolume create /mnt/@
-    btrfs subvolume create /mnt/@home
-    btrfs subvolume create /mnt/@var
-    btrfs subvolume create /mnt/@tmp
-    btrfs subvolume create /mnt/@.snapshots
-}
+#createsubvolumes () {
+#    btrfs subvolume create /mnt/@
+#    btrfs subvolume create /mnt/@home
+#    btrfs subvolume create /mnt/@var
+#    btrfs subvolume create /mnt/@tmp
+#    btrfs subvolume create /mnt/@.snapshots
+#}
 
 # @description Mount all btrfs subvolumes after root has been mounted.
-mountallsubvol () {
-    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
-    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
-    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
-    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
-}
+#mountallsubvol () {
+#    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
+#    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
+#    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
+#    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
+#}
 
 # @description BTRFS subvolulme creation and mounting.
-subvolumesetup () {
+#subvolumesetup () {
 # create nonroot subvolumes
-    createsubvolumes
+#    createsubvolumes
 # unmount root to remount with subvolume
-    umount /mnt
+#    umount /mnt
 # mount @ subvolume
-    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
+#    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
 # make directories home, .snapshots, var, tmp
-    mkdir -p /mnt/{home,var,tmp,.snapshots}
+#    mkdir -p /mnt/{home,var,tmp,.snapshots}
 # mount subvolumes
-    mountallsubvol
-}
+#    mountallsubvol
+#}
 
 if [[ "${DISK}" =~ "nvme" ]]; then
     partition2=${DISK}p2
@@ -81,29 +81,29 @@ else
     partition3=${DISK}3
 fi
 
-if [[ "${FS}" == "btrfs" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
-    mkfs.btrfs -L ROOT ${partition3} -f
-    mount -t btrfs ${partition3} /mnt
-    subvolumesetup
-elif [[ "${FS}" == "ext4" ]]; then
+#if [[ "${FS}" == "btrfs" ]]; then
+#    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
+#    mkfs.btrfs -L ROOT ${partition3} -f
+#    mount -t btrfs ${partition3} /mnt
+#    subvolumesetup
+#elif [[ "${FS}" == "ext4" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
     mkfs.ext4 -L ROOT ${partition3}
     mount -t ext4 ${partition3} /mnt
-elif [[ "${FS}" == "luks" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
+#elif [[ "${FS}" == "luks" ]]; then
+#    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat ${partition3} -
+#    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat ${partition3} -
 # open luks container and ROOT will be place holder
-    echo -n "${LUKS_PASSWORD}" | cryptsetup open ${partition3} ROOT -
+#    echo -n "${LUKS_PASSWORD}" | cryptsetup open ${partition3} ROOT -
 # now format that container
-    mkfs.btrfs -L ROOT ${partition3}
+#    mkfs.btrfs -L ROOT ${partition3}
 # create subvolumes for btrfs
-    mount -t btrfs ${partition3} /mnt
-    subvolumesetup
+#    mount -t btrfs ${partition3} /mnt
+#    subvolumesetup
 # store uuid of encrypted partition for grub
-    echo ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value ${partition3}) >> $CONFIGS_DIR/setup.conf
-fi
+#    echo ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value ${partition3}) >> $CONFIGS_DIR/setup.conf
+#fi
 
 # mount target
 mkdir -p /mnt/boot/efi
@@ -132,24 +132,24 @@ echo "
   Generated /etc/fstab:
 "
 cat /mnt/etc/fstab
-echo -ne "
--------------------------------------------------------------------------
-                    Checking for low memory systems <8G
--------------------------------------------------------------------------
-"
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -lt 8000000 ]]; then
-    # Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
-    mkdir -p /mnt/opt/swap # make a dir that we can apply NOCOW to to make it btrfs-friendly.
-    chattr +C /mnt/opt/swap # apply NOCOW, btrfs needs that.
-    dd if=/dev/zero of=/mnt/opt/swap/swapfile bs=1M count=2048 status=progress
-    chmod 600 /mnt/opt/swap/swapfile # set permissions.
-    chown root /mnt/opt/swap/swapfile
-    mkswap /mnt/opt/swap/swapfile
-    swapon /mnt/opt/swap/swapfile
-    # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
-    echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
-fi
+#echo -ne "
+#-------------------------------------------------------------------------
+#                    Checking for low memory systems <8G
+#-------------------------------------------------------------------------
+#"
+#TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+#if [[  $TOTAL_MEM -lt 8000000 ]]; then
+#    # Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
+#    mkdir -p /mnt/opt/swap # make a dir that we can apply NOCOW to to make it btrfs-friendly.
+#    chattr +C /mnt/opt/swap # apply NOCOW, btrfs needs that.
+#    dd if=/dev/zero of=/mnt/opt/swap/swapfile bs=1M count=2048 status=progress
+#    chmod 600 /mnt/opt/swap/swapfile # set permissions.
+#    chown root /mnt/opt/swap/swapfile
+#    mkswap /mnt/opt/swap/swapfile
+#    swapon /mnt/opt/swap/swapfile
+#    # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
+#    echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
+#fi
 echo -ne "
 -------------------------------------------------------------------------
                     SYSTEM READY FOR 1-setup.sh

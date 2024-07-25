@@ -3,6 +3,8 @@ openssh
 git
 neovim
 flatpak
+ufw
+
 fontconfig
 noto-fonts
 noto-fonts-emoji
@@ -12,6 +14,7 @@ ttf-hack
 ttf-roboto
 terminus-font
 libertinus-font
+
 cifs-utils
 dosfstools
 exfat-utils
@@ -19,11 +22,13 @@ exfatprogs
 ntfs-3g
 ntfsprogs
 mtools
+
 atool
 p7zip
 unrar
 unzip
 zip
+
 mangohud
 lib32-mangohud
 gamemode

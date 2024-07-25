@@ -13,4 +13,5 @@ source $CONFIGS_DIR/setup.conf
 ( arch-chroot /mnt /usr/bin/runuser -u $USERNAME -- /home/$USERNAME/arch-install/scripts/2-user.sh )|& tee 2-user.log
 ( arch-chroot /mnt $HOME/arch-install/scripts/3-post-setup.sh )|& tee 3-post-setup.log
 cp -v *.log /mnt/home/$USERNAME
+cp firewall.sh /mnt/home/$USERNAME
 

@@ -6,15 +6,15 @@ cd ~
 mkdir "/home/$USERNAME/.cache"
 mkdir "/home/$USERNAME/.config"
 mkdir -p "/home/$USERNAME/.local/state"
+mkdir -p "/home/$USERNAME/.local/src"
 mkdir -p "/home/$USERNAME/.local/share"
 mkdir -p "/home/$USERNAME/.local/state/bash"
 mkdir -p "/home/$USERNAME/.local/share/wineprefixes"
 
-cp -r ~/arch-install/configs/.config/* ~/.config/
-cp -rf ~/arch-install/configs/.bashrc ~/
-cp -rf ~/arch-install/configs/.bash_profile ~/
-
-packages=''
+cp -r $HOME/arch-install/configs/.config/* /home/$USERNAME/.config/
+cp -rf $HOME/arch-install/configs/.bashrc /home/$USERNAME/
+cp -rf $HOME/arch-install/configs/.bash_profile /home/$USERNAME/
+cp -rf $HOME/arch-install/configs/Pictures /home/$USERNAME/
 
 while IFS=read -r line ; do
     packages+=" ${line}"
@@ -38,6 +38,11 @@ while IFS=read -r line ; do
 done < $HOME/arch-install/pkg-files/aur-pkgs.txt
 
 export PATH=$PATH:~/.local/bin
+
+cd /home/$USERNAME/.local/src
+git clone https://git.suckless.org/dwm
+git clone https://git.suckless.org/dmenu
+git clone https://git.suckless.org/st
 
 echo -ne "
 -------------------------------------------------------------------------

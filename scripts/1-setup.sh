@@ -46,7 +46,7 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 pacman -Sy --noconfirm --needed
 
 #Fix long shutdowns
-sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=10s/' /etc/systemd/system.conf
+sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -71,16 +71,18 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # Graphics Drivers find and install
-gpu_type=$(lspci)
-if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils libva-nvidia-driver
-elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacman -S --noconfirm --needed mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader
-elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
-    pacman -S --noconfirm --needed intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacman -S --needed --noconfirm intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-fi
+pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa
+
+#gpu_type=$(lspci)
+#if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+#    pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils libva-nvidia-driver
+#elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
+#    pacman -S --noconfirm --needed mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader
+#elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
+#    pacman -S --noconfirm --needed intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
+#elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
+#    pacman -S --needed --noconfirm intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
+#fi
 
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/arch-install/configs/setup.conf; then
@@ -129,7 +131,7 @@ echo -ne "
 "
 if [ $(whoami) = "root"  ]; then
     useradd -m -G wheel,rfkill,games,video,audio,storage -s /bin/bash $USERNAME 
-    echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
+    echo "$USERNAME created, home directory created, added to wheel group, default shell set to /bin/bash"
 
 # use chpasswd to enter $USERNAME:$password
     echo "$USERNAME:$PASSWORD" | chpasswd
@@ -144,13 +146,13 @@ if [ $(whoami) = "root"  ]; then
 else
 	echo "You are already a user proceed with aur installs"
 fi
-if [[ ${FS} == "luks" ]]; then
+#if [[ ${FS} == "luks" ]]; then
 # Making sure to edit mkinitcpio conf if luks is selected
 # add encrypt in mkinitcpio.conf before filesystems in hooks
-    sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
+#    sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
 # making mkinitcpio with linux kernel
-    mkinitcpio -p linux
-fi
+#    mkinitcpio -p linux
+#fi
 echo -ne "
 -------------------------------------------------------------------------
                     SYSTEM READY FOR 2-user.sh

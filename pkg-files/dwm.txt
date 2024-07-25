@@ -2,6 +2,7 @@ xorg-apps
 xorg-server
 xorg-xinit
 xwallpaper
+
 mpv
 nsxiv
 dunst
@@ -10,7 +11,9 @@ newsboat
 zathura
 zathura-pdf-mupdf
 tesseract-data-pol
+
 freetype2
 libx11
 libxft
 libxinerama
+imlib2
