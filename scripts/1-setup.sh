@@ -72,7 +72,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # Graphics Drivers find and install
-pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa
+pacman -S --noconfirm --needed nvidia-lts nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa
 
 #gpu_type=$(lspci)
 #if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
