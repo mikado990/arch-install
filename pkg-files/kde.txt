@@ -3,8 +3,6 @@ ark
 dolphin
 dolphin-plugins
 gwenview
-kate
-kolourpaint
 konsole
 okular
 partitionmanager
