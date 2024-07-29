@@ -34,8 +34,10 @@ if [[ ! $AUR_HELPER == none ]]; then
 fi
 
 while IFS= read -r line ; do
-    packages+=" ${line}"
+    aur+=" ${line}"
 done < $HOME/arch-install/pkg-files/aur-pkgs.txt
+
+$AUR_HELPER -S --noconfirm $aur
 
 export PATH=$PATH:~/.local/bin
 
