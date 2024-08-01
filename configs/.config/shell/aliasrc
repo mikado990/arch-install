@@ -8,6 +8,8 @@ for command in mount umount pacman shutdown poweroff reboot ; do
 	alias $command="sudo $command"
 done; unset command
 
+alias yarn='yarn --use-yarnrc "$XDG_CONFIG_HOME/yarn/config"' # Its weird but it cleans up my HOME
+
 # Verbosity and settings that you pretty much just always are going to want.
 alias \
 	cp="cp -iv" \

@@ -22,17 +22,13 @@ echo -e "Updating grub..."
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "All set!"
 
-#echo -ne "
-#-------------------------------------------------------------------------
-#               Enabling (and Theming) Login Display Manager
-#-------------------------------------------------------------------------
-#"
-#if [[ ${DESKTOP_ENV} == "kde" ]]; then
-#  systemctl enable sddm.service
-#
-#elif [[ "${DESKTOP_ENV}" == "gnome" ]]; then
-#  systemctl enable gdm.service
-#fi
+echo -ne "
+-------------------------------------------------------------------------
+               Enabling (and Theming) Login Display Manager
+-------------------------------------------------------------------------
+"
+if [[ ${DESKTOP_ENV} == "kde" ]]; then
+  systemctl enable sddm.service
 
 echo -ne "
 -------------------------------------------------------------------------

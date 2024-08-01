@@ -41,10 +41,15 @@ $AUR_HELPER -S --noconfirm $aur
 
 export PATH=$PATH:~/.local/bin
 
-cd /home/$USERNAME/.local/src
-git clone https://git.suckless.org/dwm
-git clone https://git.suckless.org/dmenu
-git clone https://git.suckless.org/st
+# Download reshade shaders
+git clone https://github.com/crosire/reshade-shaders /home/$USERNAME/.local/share/reshade-shaders
+
+# Clone Suckless tools
+if [[ $DESKTOP_ENV == dwm ]]; then
+    git clone https://git.suckless.org/dwm /home/$USERNAME/.local/src/dwm
+    git clone https://git.suckless.org/dmenu /home/$USERNAME/.local/src/dmenu
+    git clone https://git.suckless.org/st /home/$USERNAME/.local/src/st
+fi
 
 echo -ne "
 -------------------------------------------------------------------------

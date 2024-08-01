@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # shellcheck disable=SC2155
 
 # Profile file, runs on login. Environmental variables are set here.
@@ -9,7 +9,7 @@ export PATH="$PATH:$(find ~/.local/bin -type d | paste -sd ':' -)"
 unsetopt PROMPT_SP 2>/dev/null
 
 # Default programs:
-export EDITOR="neovim"
+export EDITOR="nvim"
 export TERMINAL="st"
 export TERMINAL_PROG="st"
 export BROWSER="librewolf"
@@ -26,6 +26,7 @@ export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
 #export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export WINEPREFIX="$XDG_DATA_HOME/wineprefixes/default"
 export HISTFILE="$XDG_STATE_HOME/bash/history"
+export CARGO_HOME="$XDG_DATA_HOME/cargo" # to move rust .cargo folder
 
 # Other program settings:
 export LESS="R"
@@ -38,5 +39,5 @@ export LESS_TERMCAP_us="$(printf '%b' '[1;32m')"
 export LESS_TERMCAP_ue="$(printf '%b' '[0m')"
 export LESSOPEN="| /usr/bin/highlight -O ansi %s 2>/dev/null"
 export QT_QPA_PLATFORMTHEME="gtk2"        # Have QT use gtk2 theme.
+export _JAVA_AWT_WM_NONREPARENTING=1      # Fix for Java applications in dwm
 #export MOZ_USE_XINPUT2=1                  # Mozilla smooth scrolling/touchpads.
-#export _JAVA_AWT_WM_NONREPARENTING=1      # Fix for Java applications in dwm

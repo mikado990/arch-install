@@ -3,8 +3,6 @@
 setxkbmap -layout pl
 xwallpaper --zoom ~/Pictures/bg.jpg
 
-dunst &
-
 while true
 do
 	VOL="🔊 $(amixer get Master | tail -1 | sed 's/.*\[\([0-9]*%\)\].*/\1/')"

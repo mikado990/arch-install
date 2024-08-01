@@ -2,11 +2,14 @@ xorg-apps
 xorg-server
 xorg-xinit
 xwallpaper
+xdg-desktop-portal
+xdg-desktop-portal-gtk
 
 alsa-utils
+pulseaudio
+pavucontrol
 mpv
 nsxiv
-dunst
 htop
 newsboat
 zathura

@@ -12,7 +12,6 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 reflector -a 48 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-mkdir /mnt &>/dev/null # Hiding error message if any
 echo -ne "
 -------------------------------------------------------------------------
                     Installing Prerequisites
