@@ -2,10 +2,12 @@ xorg-apps
 xorg-server
 xorg-xinit
 xwallpaper
+xclip
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 
 alsa-utils
+lxappearance
 pulseaudio
 pavucontrol
 mpv
