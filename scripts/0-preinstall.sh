@@ -120,7 +120,7 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
-pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware grub efibootmgr networkmanager man-db man-pages archlinux-keyring
+pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware grub efibootmgr networkmanager man-db man-pages archlinux-keyring
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 cp -R ${SCRIPT_DIR} /mnt/root/arch-install
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist

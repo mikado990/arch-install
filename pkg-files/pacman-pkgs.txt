@@ -36,3 +36,5 @@ lib32-gamemode
 steam
 mesa
 lib32-mesa
+wine-staging
+lutris
