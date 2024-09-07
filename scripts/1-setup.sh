@@ -40,14 +40,6 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 #Fix long shutdowns
 sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
 
-echo -ne "
--------------------------------------------------------------------------
-                    Installing Graphics Drivers
--------------------------------------------------------------------------
-"
-# Graphics Drivers find and install
-pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa
-
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/arch-install/configs/setup.conf; then
 	# Loop through user input until the user gives a valid username
