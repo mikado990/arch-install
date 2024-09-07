@@ -11,34 +11,12 @@ echo -ne "
                Creating (and Theming) Grub Boot Menu
 -------------------------------------------------------------------------
 "
-# set kernel parameter for decrypting the drive
-#if [[ "${FS}" == "luks" ]]; then
-#sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
-#fi
 
 echo -e "Backing up Grub config..."
 cp -an /etc/default/grub /etc/default/grub.bak
 echo -e "Updating grub..."
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "All set!"
-
-echo -ne "
--------------------------------------------------------------------------
-               Enabling (and Theming) Login Display Manager
--------------------------------------------------------------------------
-"
-if [[ ${DESKTOP_ENV} == "kde" ]]; then
-  systemctl enable sddm.service
-
-echo -ne "
--------------------------------------------------------------------------
-                    Enabling Essential Services
--------------------------------------------------------------------------
-"
-systemctl enable ntpd.service
-echo "  NTP enabled"
-systemctl enable NetworkManager.service
-echo "  NetworkManager enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
