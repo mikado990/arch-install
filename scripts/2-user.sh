@@ -16,6 +16,8 @@ cp -rf $HOME/arch-install/configs/.bashrc /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/.bash_profile /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/Pictures /home/$USERNAME/
 
+pacman -Syu --noconfirm --needed 
+
 # determine processor type and install microcode
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
@@ -26,6 +28,9 @@ elif grep -E "AuthenticAMD" <<< ${proc_type}; then
     packages+=" amd-ucode"
 fi
 
+# Graphics Drivers find and install
+packages+=" nvidia-open nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader"
+
 while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/pacman-pkgs.txt
@@ -34,7 +39,7 @@ while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/${DESKTOP_ENV}.txt
 
-sudo pacman -Syu --needed --noconfirm $packages
+sudo pacman -S --needed --noconfirm $packages
 
 if [[ ! $AUR_HELPER == none ]]; then
   cd ~
