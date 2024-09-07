@@ -20,6 +20,17 @@ echo -e "All set!"
 
 echo -ne "
 -------------------------------------------------------------------------
+                    Enabling Essential Services
+-------------------------------------------------------------------------
+"
+systemctl enable ntpd.service
+echo "  NTP enabled"
+systemctl enable NetworkManager.service
+echo "  NetworkManager enabled"
+
+
+echo -ne "
+-------------------------------------------------------------------------
                     Cleaning
 -------------------------------------------------------------------------
 "
