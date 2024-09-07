@@ -16,6 +16,16 @@ cp -rf $HOME/arch-install/configs/.bashrc /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/.bash_profile /home/$USERNAME/
 cp -rf $HOME/arch-install/configs/Pictures /home/$USERNAME/
 
+# determine processor type and install microcode
+proc_type=$(lscpu)
+if grep -E "GenuineIntel" <<< ${proc_type}; then
+    echo "Installing Intel microcode"
+    packages+=" intel-ucode"
+elif grep -E "AuthenticAMD" <<< ${proc_type}; then
+    echo "Installing AMD microcode"
+    packages+=" amd-ucode"
+fi
+
 while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/pacman-pkgs.txt
@@ -24,7 +34,7 @@ while IFS= read -r line ; do
     packages+=" ${line}"
 done < $HOME/arch-install/pkg-files/${DESKTOP_ENV}.txt
 
-sudo pacman -S --needed --noconfirm $packages
+sudo pacman -Syu --needed --noconfirm $packages
 
 if [[ ! $AUR_HELPER == none ]]; then
   cd ~
@@ -33,16 +43,7 @@ if [[ ! $AUR_HELPER == none ]]; then
   makepkg -si --noconfirm
 fi
 
-while IFS= read -r line ; do
-    aur+=" ${line}"
-done < $HOME/arch-install/pkg-files/aur-pkgs.txt
-
-$AUR_HELPER -S --noconfirm $aur
-
 export PATH=$PATH:~/.local/bin
-
-# Download reshade shaders
-git clone https://github.com/crosire/reshade-shaders /home/$USERNAME/.local/share/reshade-shaders
 
 # Clone Suckless tools
 if [[ $DESKTOP_ENV == dwm ]]; then
