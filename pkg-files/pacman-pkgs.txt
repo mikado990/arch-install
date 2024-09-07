@@ -2,8 +2,14 @@ ntp
 openssh
 git
 neovim
-flatpak
+vi
 ufw
+networkmanager
+grub
+efibootmgr
+man-db
+man-pages
+
 
 fontconfig
 noto-fonts
@@ -33,8 +39,6 @@ mangohud
 lib32-mangohud
 gamemode
 lib32-gamemode
-steam
 mesa
 lib32-mesa
 wine-staging
-lutris
