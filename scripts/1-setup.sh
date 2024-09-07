@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 
 source $HOME/arch-install/configs/setup.conf
-echo -ne "
--------------------------------------------------------------------------
-                    Network Setup 
--------------------------------------------------------------------------
-"
-pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable --now NetworkManager
 
 nc=$(grep -c ^processor /proc/cpuinfo)
 echo -ne "
@@ -17,11 +10,10 @@ echo -ne "
 				changing the compression settings.
 -------------------------------------------------------------------------
 "
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -gt 8000000 ]]; then
+
 sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
 sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
-fi
+
 echo -ne "
 -------------------------------------------------------------------------
                     Setup Language to US and set locale  
@@ -44,27 +36,9 @@ sed -i 's/^#Color/Color/' /etc/pacman.conf
 
 #Enable multilib
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-pacman -Sy --noconfirm --needed
 
 #Fix long shutdowns
 sed -i 's/#DefaultTimeoutStopSec.*/DefaultTimeoutStopSec=15s/' /etc/systemd/system.conf
-
-echo -ne "
--------------------------------------------------------------------------
-                    Installing Microcode
--------------------------------------------------------------------------
-"
-# determine processor type and install microcode
-proc_type=$(lscpu)
-if grep -E "GenuineIntel" <<< ${proc_type}; then
-    echo "Installing Intel microcode"
-    pacman -S --noconfirm --needed intel-ucode
-    proc_ucode=intel-ucode.img
-elif grep -E "AuthenticAMD" <<< ${proc_type}; then
-    echo "Installing AMD microcode"
-    pacman -S --noconfirm --needed amd-ucode
-    proc_ucode=amd-ucode.img
-fi
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -73,17 +47,6 @@ echo -ne "
 "
 # Graphics Drivers find and install
 pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings intel-media-driver vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa
-
-#gpu_type=$(lspci)
-#if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-#    pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils libva-nvidia-driver
-#elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-#    pacman -S --noconfirm --needed mesa-vdpau lib32-mesa-vdpau vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver vulkan-icd-loader lib32-vulkan-icd-loader
-#elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
-#    pacman -S --noconfirm --needed intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-#elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-#    pacman -S --needed --noconfirm intel-media-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-utils
-#fi
 
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/arch-install/configs/setup.conf; then
@@ -147,13 +110,7 @@ if [ $(whoami) = "root"  ]; then
 else
 	echo "You are already a user proceed with aur installs"
 fi
-#if [[ ${FS} == "luks" ]]; then
-# Making sure to edit mkinitcpio conf if luks is selected
-# add encrypt in mkinitcpio.conf before filesystems in hooks
-#    sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
-# making mkinitcpio with linux kernel
-#    mkinitcpio -p linux
-#fi
+
 echo -ne "
 -------------------------------------------------------------------------
                     SYSTEM READY FOR 2-user.sh
